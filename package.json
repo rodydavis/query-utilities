@@ -1,0 +1,41 @@
+{
+  "name": "query-utilities",
+  "version": "0.1.0",
+  "description": "Complex query",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "keywords": [
+    "query"
+  ],
+  "author": {
+    "name": "Rody Davis",
+    "email": "rody.davis.jr@gmail.com"
+  },
+  "homepage": "https://rodydavis.github.io/query-utilities/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodydavis/query-utilities"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "browserslist": [
+    "chrome >= 50",
+    "firefox >= 52",
+    "safari >= 10",
+    "ie >= 11"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "lit": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "typescript": "^4.5.4"
+  }
+}

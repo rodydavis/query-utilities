@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "ES6",
+    "lib": [
+      "es2017",
+      "dom",
+      "dom.iterable"
+    ],
+    "outDir": "dist",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
