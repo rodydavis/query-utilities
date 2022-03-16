@@ -14,9 +14,48 @@ Search "Anything" AND (Get better >= results) OR build TO extend
 - ✅ Full Browser Support
 - ✅ 100% Typescript
 
+## Methods
+
+### 'parseQuery`
+
+Returns a query from a given string.
+
+```js
+const result = parseQuery("this AND that");
+console.log(result); // Returns AndQuery
+```
+
+### `highlight`
+
+Highlight function that wraps the referenced text with a `<mark>` tag.
+
+```js
+const result = highlight("test highlight", "test");
+console.log(result); // Returns "<mark>test</mark> highlight"
+```
+
 ## Classes
 
-This package includes all the classes used in parsing and for building results.
+### `SearchQuery`
+
+```js
+const query = new SearchQuery<any>();
+query.addSource("todos", todos, (item, search) => ({
+    type: "TODO",
+    item,
+    search,
+}));
+query.addSource("users", users, (item, search) => ({
+    type: "USER",
+    item,
+    search,
+}));
+const search = 'userId: 1';
+const results = query.getResults(search);
+console.log(results); // One result with user id === 1
+```
+
+This package also includes all the classes used in parsing and for building results:
 
 ### `Query`
 
