@@ -5,6 +5,8 @@
 
 Query utilities for javascript with zero dependencies.
 
+[Demo](https://rodydavis.github.io/query-utilities/)
+
 ```
 Search "Anything" AND (Get better >= results) OR build TO extend
 ```
