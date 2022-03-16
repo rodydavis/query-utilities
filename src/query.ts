@@ -95,7 +95,9 @@ export class SectionQuery extends Query {
   constructor(
     readonly section: string,
     readonly child: Query,
-    readonly all: boolean
+    readonly options?: {
+      all: boolean;
+    }
   ) {
     super();
   }

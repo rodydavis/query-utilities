@@ -118,12 +118,10 @@ export class SearchQuery<T> {
       return !this.matchItem(query.child, item, { section });
     }
     if (query instanceof SectionQuery) {
-      const sameSection = query.section === section;
-      const sectionAll = query.all && section === query.section;
-      const sectionMatch =
-        this.matchItem(query.child, item, { section: query.section }) &&
-        sameSection;
-      return sectionAll || sectionMatch;
+      return (
+        query.section === section &&
+        this.matchItem(query.child, item, { section: query.section })
+      );
     }
     if (query instanceof FieldCompareQuery) {
       const field = query.field;

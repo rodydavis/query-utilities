@@ -1,9 +1,24 @@
-import { AllQuery, AndQuery, FieldCompareQuery, FieldScope, GroupQuery, NotQuery, Operator, operators, OrQuery, Query, RangeQuery, SectionQuery, TextQuery } from "./query.js";
+import {
+  AllQuery,
+  AndQuery,
+  FieldCompareQuery,
+  FieldScope,
+  GroupQuery,
+  NotQuery,
+  Operator,
+  operators,
+  OrQuery,
+  Query,
+  RangeQuery,
+  SectionQuery,
+  TextQuery,
+} from "./query.js";
 
 export function parseQuery(value: string): Query {
   // Tokenize the query
-  const chars = value.split("");
-  const tokens = value.split(/\s+/);
+  const trimmed = value.trim();
+  const chars = trimmed.split("");
+  const tokens = trimmed.split(/\s+/);
   const symbols = ["AND", "OR", "NOT"];
   const tokenIdx = tokens.findIndex((t) => symbols.includes(t));
   const token = tokens[tokenIdx];
@@ -43,7 +58,7 @@ export function parseQuery(value: string): Query {
       .trim();
     const rest = spaceIdx === -1 ? "" : chars.slice(spaceIdx).join("").trim();
     const child = spaceIdx === -1 ? new AllQuery() : parseQuery(rest);
-    return new SectionQuery(section, child, rest.trim().length === 0);
+    return new SectionQuery(section, child, { all: rest.trim().length === 0 });
   }
   // Search: <exp> AND <exp>
   if (token === "AND") {
@@ -63,13 +78,12 @@ export function parseQuery(value: string): Query {
     return new NotQuery(child);
   }
   // Search: "<text>" (exact match)
-  const quoteIdx =
-    chars.findIndex((c) => c === '"') || chars.findIndex((c) => c === "'");
-  const endQuote =
-    chars.findIndex((c, i) => c === '"' && i > quoteIdx) ||
-    chars.findIndex((c, i) => c === "'" && i > quoteIdx);
-  if (quoteIdx != -1 && endQuote != -1) {
-    const text = value.slice(quoteIdx + 1, value.length - 1);
+  const quoteChars = ["'", '"'];
+  const hasQuote = quoteChars.includes(chars[0]) && chars[chars.length - 1] === chars[0];
+  if (hasQuote) {
+    const startQuote = 0;
+    const endQuote = chars.length - 1;
+    const text = value.slice(startQuote + 1, endQuote);
     return new TextQuery(text, { isExactMatch: true });
   }
   // Range query: [<start> TO <end>}
