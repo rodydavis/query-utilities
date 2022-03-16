@@ -1,6 +1,4 @@
-import { html } from "lit";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import { parseQuery } from "./parse.js";
+import { parseQuery } from "./parse";
 import {
   AllQuery,
   AndQuery,
@@ -15,23 +13,28 @@ import {
   TextQuery,
 } from "./query.js";
 
-interface Json {
+export interface Json {
   [key: string]: any;
 }
 
-export class SearchQuery<T> {
+export class SearchQuery<T, R extends Json = Json> {
   constructor(readonly max?: number) {}
-  private sources = new Map<string, Json[]>();
-  private resultBuilders = new Map<string, (item: Json, search: string) => T>();
+  private sources = new Map<string, R[]>();
+  private resultBuilders = new Map<string, (item: R, search: string) => T>();
 
   get sections(): string[] {
     return Array.from(this.sources.keys());
   }
 
+  reset() {
+    this.sources.clear();
+    this.resultBuilders.clear();
+  }
+
   addSource(
     source: string,
-    items: Json[],
-    resultBuilder: (item: any, search: string) => T
+    items: R[],
+    resultBuilder: (item: R, search: string) => T
   ) {
     this.sources.set(source, items);
     this.resultBuilders.set(source, resultBuilder as any);
@@ -47,6 +50,11 @@ export class SearchQuery<T> {
     const results: T[] = [];
     const query = this.getQuery(raw);
     for (const key of this.sources.keys()) {
+      if (query instanceof SectionQuery && query.child instanceof AllQuery) {
+        if (query.section === key) {
+          return this.getSection(key);
+        }
+      }
       if (this.max && results.length >= this.max) {
         return results;
       }
@@ -72,7 +80,7 @@ export class SearchQuery<T> {
     query: Query,
     key: string,
     results: T[],
-    match: (item: Json) => void
+    match: (item: R) => void
   ) {
     const values = this.sources.get(key);
     if (!values) return;
@@ -87,7 +95,7 @@ export class SearchQuery<T> {
 
   matchItem(
     query: Query,
-    item: Json,
+    item: R,
     options?: {
       field?: string;
       section?: string;
@@ -180,10 +188,4 @@ export class SearchQuery<T> {
     }
     return false;
   }
-}
-
-export function highlight(source: string, query: string) {
-  const re = new RegExp(query, "gi");
-  const result = source.replace(re, (match) => `<mark>${match}</mark>`);
-  return html`${unsafeHTML(result)}`;
 }
