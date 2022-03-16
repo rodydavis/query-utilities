@@ -63,18 +63,18 @@ export class RangeQuery extends Query {
   type = "RANGE";
 }
 
-export class NotQuery extends Query {
-  constructor(readonly child: Query) {
-    super();
-  }
-  type = "NOT";
-}
-
 export class GroupQuery extends Query {
   constructor(readonly child: Query) {
     super();
   }
   type = "GROUP";
+}
+
+export class NotQuery extends Query {
+  constructor(readonly child: Query) {
+    super();
+  }
+  type = "NOT";
 }
 
 export class AndQuery extends Query {
