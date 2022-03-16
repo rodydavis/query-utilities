@@ -35,13 +35,13 @@ export class FieldScope extends Query {
 export const operators = <const>["=", "!=", "<", "<=", ">", ">="];
 export type Operator = typeof operators[number];
 
-export class FieldCompareQuery extends Query {
+export class FieldCompareQuery extends FieldScope {
   constructor(
     readonly field: string,
     readonly operator: Operator,
     readonly text: TextQuery
   ) {
-    super();
+    super(field, text);
   }
   type = "FIELD_COMPARE";
 }
@@ -77,28 +77,29 @@ export class NotQuery extends Query {
   type = "NOT";
 }
 
-export class AndQuery extends Query {
+export abstract class ChildrenQuery extends Query {
   constructor(readonly children: Query[]) {
     super();
   }
+  get left(): Query {
+    return this.children[0];
+  }
+
+  get right(): Query {
+    return this.children[1];
+  }
+}
+
+export class AndQuery extends ChildrenQuery {
   type = "AND";
 }
 
-export class OrQuery extends Query {
-  constructor(readonly children: Query[]) {
-    super();
-  }
+export class OrQuery extends ChildrenQuery {
   type = "OR";
 }
 
 export class SectionQuery extends Query {
-  constructor(
-    readonly section: string,
-    readonly child: Query,
-    readonly options?: {
-      all: boolean;
-    }
-  ) {
+  constructor(readonly section: string, readonly child: Query) {
     super();
   }
   type = "SECTION";

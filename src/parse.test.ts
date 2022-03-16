@@ -26,7 +26,7 @@ describe("text tests", () => {
     const query = parseQuery(`"hello"`) as TextQuery;
 
     assert.isDefined(query);
-    assert.equal(query.type, "TEXT");
+    assert.equal(query.type, "PHRASE");
     assert.equal(query.options.isExactMatch, true);
   });
 
@@ -43,7 +43,7 @@ describe("text tests", () => {
     const query = parseQuery(`"hello test  "`) as TextQuery;
 
     assert.isDefined(query);
-    assert.equal(query.type, "TEXT");
+    assert.equal(query.type, "PHRASE");
     assert.equal(query.text, "hello test");
     assert.equal(query.options.isExactMatch, true);
   });
@@ -127,7 +127,6 @@ describe("section tests", () => {
     assert.isDefined(query);
     assert.equal(query.type, "SECTION");
     assert.equal(query.section, "section");
-    assert.equal(query.options.all, true);
     assert.equal(query.child instanceof AllQuery, true);
   });
 
@@ -137,7 +136,6 @@ describe("section tests", () => {
     assert.isDefined(query);
     assert.equal(query.type, "SECTION");
     assert.equal(query.section, "section");
-    assert.equal(query.options.all, false);
     assert.equal(query.child instanceof TextQuery, true);
   });
 });
@@ -192,7 +190,7 @@ describe("complex tests", () => {
     assert.isDefined(query);
     assert.equal(query.type, "AND");
     assert.equal(query.children.length, 2);
-    assert.equal(left.type, "TEXT");
+    assert.equal(left.type, "PHRASE");
     assert.equal(right.type, "TEXT");
   });
 });

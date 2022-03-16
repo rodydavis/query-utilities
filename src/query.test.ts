@@ -98,11 +98,11 @@ describe("Class implementations", () => {
 
   it("SectionQuery", () => {
     const child = new TextQuery("");
-    const item = new SectionQuery("section", child, { all: false });
+    const item = new SectionQuery("section", child);
 
     assert.equal(item instanceof Query, true);
     assert.equal(item.section, "section");
-    assert.equal(item.options.all, false);
+    assert.equal(item.child instanceof AllQuery, false);
     assert.equal(item.type, "SECTION");
   });
 });

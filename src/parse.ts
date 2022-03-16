@@ -8,6 +8,7 @@ import {
   Operator,
   operators,
   OrQuery,
+  PhraseQuery,
   Query,
   RangeQuery,
   SectionQuery,
@@ -19,7 +20,7 @@ export function parseQuery(value: string): Query {
   const trimmed = value.trim();
   const chars = value.split("");
   const tokens = value.split(/\s+/);
-  const symbols = ["AND", "OR", "NOT"];
+  const symbols = ["AND", "OR", "NOT"]; // && || !
   const tokenIdx = tokens.findIndex((t) => symbols.includes(t));
   const token = tokens[tokenIdx];
   const charSymbols = ["(", '"', "'"];
@@ -77,12 +78,13 @@ export function parseQuery(value: string): Query {
       .trim();
     const rest = spaceIdx === -1 ? "" : chars.slice(spaceIdx).join("").trim();
     const child = spaceIdx === -1 ? new AllQuery() : parseQuery(rest);
-    return new SectionQuery(section, child, { all: rest.trim().length === 0 });
+    return new SectionQuery(section, child);
   }
   // Search: "<text>" (exact match)
   const quotes = hasQuote(value, ["'", '"']);
   if (quotes.valid) {
-    return new TextQuery(quotes.value, { isExactMatch: true });
+    const children = quotes.value.split(" ").map((t) => new TextQuery(t));
+    return new PhraseQuery(quotes.value, children);
   }
   // Range query: [<start> TO <end>}
   const inclusiveStart = chars.findIndex((c) => c === "[");
