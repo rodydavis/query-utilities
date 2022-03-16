@@ -1,7 +1,7 @@
 {
   "name": "query-utilities",
   "version": "0.0.1",
-  "description": "Complex query",
+  "description": "Query utilities for javascript with zero dependencies",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
