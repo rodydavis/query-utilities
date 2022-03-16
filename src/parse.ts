@@ -17,15 +17,35 @@ import {
 export function parseQuery(value: string): Query {
   // Tokenize the query
   const trimmed = value.trim();
-  const chars = trimmed.split("");
-  const tokens = trimmed.split(/\s+/);
+  const chars = value.split("");
+  const tokens = value.split(/\s+/);
   const symbols = ["AND", "OR", "NOT"];
   const tokenIdx = tokens.findIndex((t) => symbols.includes(t));
   const token = tokens[tokenIdx];
+  const charSymbols = ["(", '"', "'"];
+  const charIdx = chars.findIndex((c) => charSymbols.includes(c));
+  const char = chars[charIdx];
+  // Search: <exp> AND <exp>
+  if (token === "AND") {
+    const left = parseQuery(tokens.slice(0, tokenIdx).join(" "));
+    const right = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
+    return new AndQuery([left, right]);
+  }
+  // Search: <exp> OR <exp>
+  if (token === "OR") {
+    const left = parseQuery(tokens.slice(0, tokenIdx).join(" "));
+    const right = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
+    return new OrQuery([left, right]);
+  }
+  // Search: NOT <exp>
+  if (token === "NOT") {
+    const child = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
+    return new NotQuery(child);
+  }
   // Search: (<exp>)
-  const charIdx = chars.findIndex((c) => c === "(");
-  if (charIdx != -1 && chars.slice(charIdx).findIndex((c) => c === ")") != -1) {
-    const child = parseQuery(value.slice(charIdx + 1, value.length - 1));
+  const endIdx = chars.findIndex((c) => c === ")");
+  if (char === "(" && endIdx != -1) {
+    const child = parseQuery(value.slice(charIdx + 1, endIdx - 1));
     return new GroupQuery(child);
   }
   // Search: <field> <op> <text>
@@ -50,7 +70,6 @@ export function parseQuery(value: string): Query {
   // Search: @<section> <text>
   const sectionIdx = chars.findIndex((t) => t === "@");
   if (sectionIdx !== -1) {
-    console.log(value);
     const spaceIdx = chars.findIndex((t) => t === " ");
     const section = chars
       .slice(1, spaceIdx === -1 ? chars.length : spaceIdx)
@@ -60,31 +79,10 @@ export function parseQuery(value: string): Query {
     const child = spaceIdx === -1 ? new AllQuery() : parseQuery(rest);
     return new SectionQuery(section, child, { all: rest.trim().length === 0 });
   }
-  // Search: <exp> AND <exp>
-  if (token === "AND") {
-    const left = parseQuery(tokens.slice(0, tokenIdx).join(" "));
-    const right = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
-    return new AndQuery([left, right]);
-  }
-  // Search: <exp> OR <exp>
-  if (token === "OR") {
-    const left = parseQuery(tokens.slice(0, tokenIdx).join(" "));
-    const right = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
-    return new OrQuery([left, right]);
-  }
-  // Search: NOT <exp>
-  if (token === "NOT") {
-    const child = parseQuery(tokens.slice(tokenIdx + 1).join(" "));
-    return new NotQuery(child);
-  }
   // Search: "<text>" (exact match)
-  const quoteChars = ["'", '"'];
-  const hasQuote = quoteChars.includes(chars[0]) && chars[chars.length - 1] === chars[0];
-  if (hasQuote) {
-    const startQuote = 0;
-    const endQuote = chars.length - 1;
-    const text = value.slice(startQuote + 1, endQuote);
-    return new TextQuery(text, { isExactMatch: true });
+  const quotes = hasQuote(value, ["'", '"']);
+  if (quotes.valid) {
+    return new TextQuery(quotes.value, { isExactMatch: true });
   }
   // Range query: [<start> TO <end>}
   const inclusiveStart = chars.findIndex((c) => c === "[");
@@ -113,5 +111,40 @@ export function parseQuery(value: string): Query {
     });
   }
   // Search: <text>
-  return new TextQuery(value, { isExactMatch: false });
+  return new TextQuery(trimmed, { isExactMatch: false });
+}
+
+function hasQuote(value: string, quoteChars: string[]) {
+  let idx = 0;
+  let startIdx = -1;
+  let endIdx = -1;
+  let firstCharIdx = -1;
+  let lastCharIdx = -1;
+  while (idx < value.length) {
+    const char = value[idx];
+    if (char === "" || char === " ") {
+      idx++;
+      continue;
+    }
+    if (quoteChars.includes(char)) {
+      if (startIdx === -1) {
+        startIdx = idx;
+      } else {
+        endIdx = idx;
+      }
+    } else {
+      if (firstCharIdx === -1) {
+        firstCharIdx = idx;
+      } else {
+        lastCharIdx = idx;
+      }
+    }
+    idx++;
+  }
+  const valid = startIdx !== -1 && endIdx !== -1 && startIdx < endIdx;
+  const innerValid = firstCharIdx >= startIdx + 1 && lastCharIdx <= endIdx - 1;
+  return {
+    valid: valid && innerValid,
+    value: value.slice(firstCharIdx, lastCharIdx + 1),
+  };
 }
