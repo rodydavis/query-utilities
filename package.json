@@ -1,6 +1,6 @@
 {
   "name": "query-utilities",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Complex query",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -30,7 +30,7 @@
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "build": "tsc && vite build"
+    "build": "tsc"
   },
   "dependencies": {},
   "devDependencies": {
