@@ -16,7 +16,7 @@ Search "Anything" AND (Get better >= results) OR build TO extend
 
 ## Methods
 
-### 'parseQuery`
+### `parseQuery`
 
 Returns a query from a given string.
 
