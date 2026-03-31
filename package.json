@@ -32,12 +32,11 @@
     "coverage": "vitest run --coverage",
     "build": "tsc"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "c8": "^7.11.0",
-    "typescript": "^4.5.4",
-    "vite": "^2.8.6",
-    "vitest": "^0.6.1"
+    "@types/node": "^22.19.15",
+    "@vitest/coverage-v8": "^4.1.2",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
   }
 }

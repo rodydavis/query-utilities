@@ -6,7 +6,7 @@
     "declaration": true,
     "sourceMap": true,
     "emitDeclarationOnly": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "esnext",
     "target": "ES6",
     "lib": [
